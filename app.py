@@ -9,18 +9,21 @@ st.write("Enter your details below to run the projection:")
 # --- User Inputs ---
 L = st.number_input("Base Life Cover (NZD)", value=500000.0, step=10000.0)
 P0 = st.number_input("Baseline Premium (NZD)", value=1800.0, step=50.0)
-K0 = st.number_input("KiwiSaver Start Balance (NZD)", value=0.0, step=1000.0)
-S0 = st.number_input("Annual Salary Contribution (NZD)", value=0.0, step=100.0)
+g = st.number_input("Annual Premium Escalation Rate (%)", value=3.0, step=0.1) / 100
+r_avg = st.number_input("Annual ROI vs Avg Capital Base (%)", value=5.011, step=0.01) / 100
+K0 = st.number_input("KiwiSaver Start Balance (NZD)", value=100000.0, step=1000.0)
+Salary = st.number_input("Annual Salary (NZD)", value=80000.0, step=1000.0)
+percetnage = st.number_input("Annual KiwiSaver Contribution (%)", value=3.0, step=0.5)/100
 
 # --- Run Calculator ---
 if st.button("Run Projection"):
     df = calculator(max_t=30,  # fixed at 2 for now
                     L=L,
                     P0=P0,
-                    g=0.03,
-                    r_avg=0.05011,
+                    g=g,
+                    r_avg=r_avg,
                     K0=K0,
-                    S0=S0,
+                    S0=Salary * percetnage,
                     alpha=1.0)
     
     st.subheader("Projection Results")
