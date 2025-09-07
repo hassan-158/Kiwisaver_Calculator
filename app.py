@@ -13,6 +13,7 @@ g = st.number_input("Annual Premium Escalation Rate (%)", value=3.0, step=0.1) /
 r_avg = st.number_input("Annual Rate on Investment (%)", value=5.011, step=0.01) / 100
 K0 = st.number_input("KiwiSaver Start Balance (NZD)", value=100000.0, step=1000.0)
 Salary = st.number_input("Annual Salary (NZD)", value=80000.0, step=1000.0)
+si = st.number_input("Annual Salary Increase (%)", value=3.0, step=0.5)/100
 percetnage = st.number_input("Annual KiwiSaver Contribution (%)", value=3.0, step=0.5)/100
 
 # --- Run Calculator ---
@@ -23,6 +24,7 @@ if st.button("Run Projection"):
                     g=g,
                     r_avg=r_avg,
                     K0=K0,
+                    si=si,
                     S0=Salary * percetnage,
                     alpha=1.0)
     

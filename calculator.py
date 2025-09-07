@@ -6,6 +6,7 @@ def calculator(max_t:int,
                g:float,
                r_avg:float,
                K0:float,
+               si: float,
                S0:float,
                alpha:float=1.0):
     """
@@ -49,12 +50,13 @@ def calculator(max_t:int,
         dPt = Pt - P_off_t
         Vt = dPt
         
+        St = S0 * (1+si)**t
         # Annual return using average capital base method
-        avg_capital_base = Kt + 0.5*(S0 + Vt)
+        avg_capital_base = Kt + 0.5*(St + Vt)
         return_t = r_avg * avg_capital_base
         
         # End balance
-        Kt1 = Kt + S0 + Vt + return_t
+        Kt1 = Kt + St + Vt + return_t
         
         rows.append({
             "years": t,
@@ -65,7 +67,7 @@ def calculator(max_t:int,
             "Premium w/ Offset": P_off_t,
             "Premium Saving": dPt,
             "Voluntary Contribution": Vt,
-            "Annual Salary Contribution": S0,
+            "Annual Salary Contribution": St,
             "Annual Investment Return": return_t,
             "KiwiSaver End Balance": Kt1
         })
@@ -78,13 +80,13 @@ def calculator(max_t:int,
     return pd.DataFrame(rows)
 
 
-# Test run for 2 years with your sample parameters
-df_test = calculator(max_t=2,
-                     L=500_000,
-                     P0=1800,
-                     g=0.03,
-                     r_avg=0.05011,
-                     K0=120_000,
-                     S0=6800,
-                     alpha=1.0)
+# # Test run for 2 years with your sample parameters
+# df_test = calculator(max_t=2,
+#                      L=500_000,
+#                      P0=1800,
+#                      g=0.03,
+#                      r_avg=0.05011,
+#                      K0=120_000,
+#                      S0=6800,
+#                      alpha=1.0)
 
