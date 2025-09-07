@@ -57,7 +57,7 @@ def calculator(max_t:int,
         Kt1 = Kt + S0 + Vt + return_t
         
         rows.append({
-            "t": t,
+            "years": t,
             "KiwiSaver Start Balance": Kt,
             "Baseline Premium": Pt,
             "Offset": Ot,
@@ -71,6 +71,9 @@ def calculator(max_t:int,
         })
         
         Kt = Kt1  # update for next year
+
+        if Kt >= L:
+            break
     
     return pd.DataFrame(rows)
 

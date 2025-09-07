@@ -17,7 +17,7 @@ percetnage = st.number_input("Annual KiwiSaver Contribution (%)", value=3.0, ste
 
 # --- Run Calculator ---
 if st.button("Run Projection"):
-    df = calculator(max_t=30,  # fixed at 2 for now
+    df = calculator(max_t=100,  # fixed at 2 for now
                     L=L,
                     P0=P0,
                     g=g,
@@ -25,6 +25,10 @@ if st.button("Run Projection"):
                     K0=K0,
                     S0=Salary * percetnage,
                     alpha=1.0)
+    
+    # --- Show message when KiwiSaver fully offsets Life Cover ---
+    last_year = df["years"].iloc[-1]
+    st.success(f"Based on your inputs, the client will no longer need life cover after year {last_year}.")
     
     st.subheader("Projection Results")
     st.dataframe(df.style.format({
@@ -39,3 +43,4 @@ if st.button("Run Projection"):
         "Annual Investment Return": "{:,.2f}",
         "KiwiSaver End Balance": "{:,.2f}"
     }))
+    
