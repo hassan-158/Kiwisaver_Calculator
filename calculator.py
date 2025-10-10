@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 def calculator(max_t:int,
                L:float,
@@ -37,6 +38,7 @@ def calculator(max_t:int,
     """
     rows = []
     Kt = K0
+    full_cover_t = np.inf
     for t in range(max_t+1):
         # Premium escalation
         Pt = P0 * (1+g)**t
@@ -59,7 +61,7 @@ def calculator(max_t:int,
         Kt1 = Kt + St + Vt + return_t
         
         rows.append({
-            "years": t,
+            "year": t + 1,
             "KiwiSaver Start Balance": Kt,
             "Baseline Premium": Pt,
             "Offset": Ot,
@@ -74,10 +76,10 @@ def calculator(max_t:int,
         
         Kt = Kt1  # update for next year
 
-        if Kt >= L:
-            break
+        if Kt >= L and full_cover_t >= t + 1:
+            full_cover_t = t + 1
     
-    return pd.DataFrame(rows)
+    return pd.DataFrame(rows), full_cover_t
 
 
 # # Test run for 2 years with your sample parameters
