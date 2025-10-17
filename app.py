@@ -2,11 +2,21 @@ import streamlit as st
 import pandas as pd
 from calculator import calculator
 import plotly.graph_objects as go
+from PIL import Image
+
+BRAND = {
+    "yellow": "#FFD200",
+    "dark": "#222222",
+}
+
+col1, col2 = st.columns([0.2, 1])
+with col1:
+    logo = Image.open("assets/logo.png")
+    st.image(logo, use_container_width=True)
+
+st.title("Wealthhq Life Cover Offset Calculator")
 
 st.set_page_config(page_title="KiwiSaver Offset Projection", layout="wide")
-
-
-st.title("KiwiSaver + Life Cover Offset Projection")
 st.write("Enter your details below to run the projection:")
 
 # --- User Inputs ---
@@ -49,7 +59,6 @@ if st.button("Run Projection"):
     )
     
     # --- Show message when KiwiSaver fully offsets Life Cover ---
-    # last_year = df["years"].iloc[-1]
     st.success(f"Based on your inputs, the client will no longer need life cover at age {full_cover_t + current_age}.")
     
     st.subheader("Projection Results")
@@ -69,7 +78,6 @@ if st.button("Run Projection"):
     )
     
     st.title("Offset vs No Offset Benchmark")
-    # --- Summary Statistics ---
     st.subheader("Summary Statistics")
 
     total_premium_with_offset = df_offset["Premium w/ Offset"].sum()
@@ -78,11 +86,9 @@ if st.button("Run Projection"):
     ks_end_with_offset = df_offset["KiwiSaver End Balance"].iloc[-1]
     ks_end_without_offset = df_no_offset["KiwiSaver End Balance"].iloc[-1]
 
-    # True cost = difference in end balances
     total_true_cost = ks_end_with_offset - ks_end_without_offset
     per_year_true_cost = total_true_cost / (stop_age - current_age)
 
-    # Display in columns
     col1, col2, col3, col4 = st.columns([2, 2, 1, 1])
     col1.metric("Total Cost of Insurance Premiums (With Offset)", f"${total_premium_with_offset:,.0f}")
     col2.metric("Total Cost of Insurance Premiums (Without Offset)", f"${total_premium_without_offset:,.0f}")
@@ -103,13 +109,15 @@ if st.button("Run Projection"):
             x=df_offset["year"] + current_age,
             y=df_offset["KiwiSaver End Balance"],
             mode="lines+markers",
-            name="KiwiSaver (With Offset)"
+            name="KiwiSaver (With Offset)",
+            line=dict(color=BRAND["yellow"], width=3)
         ))
         fig_ks.add_trace(go.Scatter(
             x=df_no_offset["year"] + current_age,
             y=df_no_offset["KiwiSaver End Balance"],
             mode="lines+markers",
-            name="KiwiSaver (Without Offset)"
+            name="KiwiSaver (Without Offset)",
+            line=dict(color=BRAND["dark"], width=3)
         ))
         fig_ks.update_layout(
             title="KiwiSaver Balance",
@@ -127,13 +135,15 @@ if st.button("Run Projection"):
             x=df_offset["year"] + current_age,
             y=df_offset["Premium w/ Offset"],
             mode="lines+markers",
-            name="Premium (With Offset)"
+            name="Premium (With Offset)",
+            line=dict(color=BRAND["yellow"], width=3)
         ))
         fig_prem.add_trace(go.Scatter(
             x=df_no_offset["year"] + current_age,
             y=df_no_offset["Baseline Premium"],
             mode="lines+markers",
-            name="Premium (Without Offset)"
+            name="Premium (Without Offset)",
+            line=dict(color=BRAND["dark"], width=3)
         ))
         fig_prem.update_layout(
             title="Insurance Premiums",
@@ -154,13 +164,15 @@ if st.button("Run Projection"):
             x=df_offset["year"] + current_age,
             y=df_offset["Effective Cover"],
             mode="lines+markers",
-            name="Life Cover (With Offset)"
+            name="Life Cover (With Offset)",
+            line=dict(color=BRAND["yellow"], width=3)
         ))
         fig_cover.add_trace(go.Scatter(
             x=df_no_offset["year"] + current_age,
             y=[L] * len(df_no_offset),
             mode="lines+markers",
-            name="Life Cover (Without Offset)"
+            name="Life Cover (Without Offset)",
+            line=dict(color=BRAND["dark"], width=3)
         ))
         fig_cover.update_layout(
             title="Life Cover Level",
@@ -178,13 +190,15 @@ if st.button("Run Projection"):
             x=df_offset["year"] + current_age,
             y=df_offset["Annual Investment Return"],
             mode="lines+markers",
-            name="Investment Return (With Offset)"
+            name="Investment Return (With Offset)",
+            line=dict(color=BRAND["yellow"], width=3)
         ))
         fig_return.add_trace(go.Scatter(
             x=df_no_offset["year"] + current_age,
             y=df_no_offset["Annual Investment Return"],
             mode="lines+markers",
-            name="Investment Return (Without Offset)"
+            name="Investment Return (Without Offset)",
+            line=dict(color=BRAND["dark"], width=3)
         ))
         fig_return.update_layout(
             title="Annual KiwiSaver Investment Return",
