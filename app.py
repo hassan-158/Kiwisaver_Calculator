@@ -3,11 +3,8 @@ import pandas as pd
 import plotly.graph_objects as go
 from PIL import Image
 
-from calculator import (
-    calculator_phaseout,
-    calculator_total_wealth,
-    responsibility_for_age
-)
+from calculator import *
+
 
 # Branding colours
 BRAND = {
