@@ -279,7 +279,7 @@ if st.button("Run Projection"):
                     "Responsibilities Start": "{:,.2f}",
                     "Baseline Premium": "{:,.2f}",
                     "Required Cover": "{:,.2f}",
-                    "Premium w/ Required Cover": "{:,.2f}",
+                    "Premium w/ Offset": "{:,.2f}",
                     "Premium Saving": "{:,.2f}",
                     "Voluntary Contribution": "{:,.2f}",
                     "Annual Salary Contribution": "{:,.2f}",

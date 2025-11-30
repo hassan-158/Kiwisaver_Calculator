@@ -92,15 +92,14 @@ def calculator_total_wealth(
     debt_shrink_rate: float
 ):
     """
-    Total-Wealth life cover projection.
-    Returns DataFrame with start/end-of-year values for assets, liabilities, responsibilities,
-    and required cover before any phase-outs.
-    Also returns the first year where Required Cover is fully offset (full_cover_t).
+    Total-Wealth life cover projection with phase-out style premium calculation.
+    Offsets are applied based on previous year's required cover.
     """
     # Initialize start-of-year values
     Kt = K0
     assets_t = property_value + cash + managed_funds + other_assets
     debt_t = liabilities
+    required_cover_prev = max(0.0, debt_t + sum([responsibility_for_age(age) for age in child_ages]) + FUNERAL_AND_BUFFER - Kt - assets_t)
 
     rows = []
     full_cover_t = np.inf
@@ -114,11 +113,14 @@ def calculator_total_wealth(
         total_liabilities_start = debt_start + responsibilities_start + FUNERAL_AND_BUFFER
         required_cover_start = max(0.0, total_liabilities_start - total_wealth_start)
 
-        # ------------------ Premiums and offsets ------------------
+        # ------------------ Premiums and offsets (phase-out style) ------------------
         Pt = P0 * (1 + g) ** t
-        offset = min(Kt, required_cover_start)
-        effective_cover = required_cover_start - offset
-        premium_with_offset = Pt * (effective_cover / max(1, required_cover_start)) if required_cover_start > 0 else 0.0
+        if t == 0:
+            premium_with_offset = Pt
+        elif required_cover_prev == 0:
+            premium_with_offset = 0
+        else:
+            premium_with_offset = Pt * required_cover_start / required_cover_prev
         premium_saving = Pt - premium_with_offset
         voluntary_contribution = premium_saving
 
@@ -142,7 +144,7 @@ def calculator_total_wealth(
             "Responsibilities Start": responsibilities_start,
             "Baseline Premium": Pt,
             "Required Cover": required_cover_start,
-            "Premium w/ Required Cover": premium_with_offset,
+            "Premium w/ Offset": premium_with_offset,
             "Premium Saving": premium_saving,
             "Voluntary Contribution": voluntary_contribution,
             "Annual Salary Contribution": St,
@@ -154,17 +156,20 @@ def calculator_total_wealth(
         })
 
         # ------------------ Determine full_cover_t ------------------
-        # Check after Kt1 growth applied: this marks the first year the cover is fully offset
         gap_next = max(0.0, debt_end + responsibilities_end + FUNERAL_AND_BUFFER - (Kt1 + assets_end))
         if gap_next <= 0.0 and full_cover_t == np.inf:
-            full_cover_t = t + 1  # 1-based index (first fully covered year)
+            full_cover_t = t + 1
 
         # Prepare for next year
         Kt = Kt1
         assets_t = assets_end
         debt_t = debt_end
+        required_cover_prev = required_cover_start  # store this for next year's premium scaling
 
     if full_cover_t == np.inf:
         full_cover_t = None
 
     return pd.DataFrame(rows), full_cover_t
+
+
+
