@@ -271,6 +271,12 @@ if st.button("Run Projection"):
     if tab_total is not None:
         with tab_total:
             st.header("Total-Wealth Strategy")
+            st.subheader("Summary")
+            starting_cover = df_total.iloc[0]["Required Cover"]
+
+            col1, col2 = st.columns([2, 2])
+            col1.metric("Starting Required Life Cover", f"${starting_cover:,.0f}")
+            col2.metric("Phase Out Length (Years)", f"{full_cover_t_total:.0f}")
             st.dataframe(
                 df_total.style.format({
                     "KiwiSaver Start Balance": "{:,.2f}",
