@@ -2,8 +2,6 @@ import pandas as pd
 import numpy as np
 from typing import List, Tuple
 
-# Hidden constant: Funeral/impact buffer (not exposed in UI)
-FUNERAL_AND_BUFFER = 100_000  # fixed and used only internally
 
 def calculator_phaseout(max_t:int,
                         L:float,
@@ -75,7 +73,6 @@ def responsibility_for_age(age: int) -> float:
 
 def calculator_total_wealth(
     max_t: int,
-    L: float,  # initial gap only, funeral handled below
     P0: float,
     g: float,
     r_avg: float,
@@ -89,7 +86,9 @@ def calculator_total_wealth(
     liabilities: float,
     child_ages: list,
     asset_growth_rate: float,
-    debt_shrink_rate: float
+    debt_shrink_rate: float,
+    holding_amount: float,
+    funeral_cost: float
 ):
     """
     Total-Wealth life cover projection with phase-out style premium calculation.
@@ -99,7 +98,7 @@ def calculator_total_wealth(
     Kt = K0
     assets_t = property_value + cash + managed_funds + other_assets
     debt_t = liabilities
-    required_cover_prev = max(0.0, debt_t + sum([responsibility_for_age(age) for age in child_ages]) + FUNERAL_AND_BUFFER - Kt - assets_t)
+    required_cover_prev = max(0.0, debt_t + sum([responsibility_for_age(age) for age in child_ages]) + funeral_cost + holding_amount - Kt - assets_t)
 
     rows = []
     full_cover_t = np.inf
@@ -110,7 +109,7 @@ def calculator_total_wealth(
         debt_start = debt_t
         responsibilities_start = sum([responsibility_for_age(age + t) for age in child_ages])
         total_wealth_start = Kt + assets_start
-        total_liabilities_start = debt_start + responsibilities_start + FUNERAL_AND_BUFFER
+        total_liabilities_start = debt_start + responsibilities_start + funeral_cost + holding_amount
         required_cover_start = max(0.0, total_liabilities_start - total_wealth_start)
 
         # ------------------ Premiums and offsets (phase-out style) ------------------
@@ -156,7 +155,7 @@ def calculator_total_wealth(
         })
 
         # ------------------ Determine full_cover_t ------------------
-        gap_next = max(0.0, debt_end + responsibilities_end + FUNERAL_AND_BUFFER - (Kt1 + assets_end))
+        gap_next = max(0.0, debt_end + responsibilities_end + funeral_cost + holding_amount - (Kt1 + assets_end))
         if gap_next <= 0.0 and full_cover_t == np.inf:
             full_cover_t = t + 1
 

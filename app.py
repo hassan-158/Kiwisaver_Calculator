@@ -48,7 +48,8 @@ managed_funds = st.number_input("Managed Funds (NZD)", value=100_000.0, step=1_0
 other_assets = st.number_input("Other Assets (NZD)", value=20_000.0, step=1_000.0, format="%f")
 
 liabilities = st.number_input("Total Liabilities (NZD)", value=600_000.0, step=1_000.0, format="%f")
-
+holding_amount = st.number_input("Holding Amount (NZD)", value=200_000.0, step=1_000.0, format="%f")
+funeral_cost = st.number_input("Funeral Cost (NZD)", value=100_000.0, step=1_000.0, format="%f")
 asset_growth_rate = st.number_input("Annual Asset Growth Rate (%)", value=5.01, step=0.1) / 100.0
 debt_shrink_rate = st.number_input("Annual Debt Shrink Rate (%)", value=5.01, step=0.1) / 100.0
 
@@ -93,24 +94,17 @@ if st.button("Run Projection"):
         alpha=0.0
     )
 
-    # ---------- Compute initial total wealth gap ----------
-    # Sum all assets
-    total_assets_start = float(property_value) + float(cash) + float(managed_funds) + float(other_assets)
-
-    # Compute total remaining responsibilities for all children (sum over remaining years until 18)
-    responsibilities_start = sum([responsibility_for_age(age) for age in child_ages])
-
-    # Total wealth gap (negative if liabilities + responsibilities exceed assets)
-    total_wealth_gap = float(K0) + total_assets_start - liabilities - responsibilities_start
-
-    # L for the model is just the gap (funeral/buffer handled inside the calculator)
-    L_total_wealth = max(0, -total_wealth_gap)  # only if gap is negative, else 0
+    # ---------- Compute initial Premium ----------
+    Kt = K0
+    assets_t = property_value + cash + managed_funds + other_assets
+    debt_t = liabilities
+    required_cover_prev = max(0.0, debt_t + sum([responsibility_for_age(age) for age in child_ages]) + funeral_cost + holding_amount - Kt - assets_t)
+    baseline_premium = P0 * (required_cover_prev / L)
 
     # ---------- Total-Wealth model ----------
     df_total, full_cover_t_total = calculator_total_wealth(
         max_t=int(stop_age - current_age),
-        L=L_total_wealth,          # <-- gap only, funeral/buffer handled inside
-        P0=P0,
+        P0=baseline_premium,
         g=g,
         r_avg=r_avg,
         K0=K0,
@@ -123,7 +117,9 @@ if st.button("Run Projection"):
         liabilities=liabilities,
         child_ages=child_ages,
         asset_growth_rate=asset_growth_rate,
-        debt_shrink_rate=debt_shrink_rate
+        debt_shrink_rate=debt_shrink_rate,
+        holding_amount=holding_amount,
+        funeral_cost=funeral_cost
     )
 
     # ---------- Success message restored ----------
@@ -274,26 +270,28 @@ if st.button("Run Projection"):
             st.subheader("Summary")
             starting_cover = df_total.iloc[0]["Required Cover"]
 
-            col1, col2 = st.columns([2, 2])
+            col1, col2, col3, col4 = st.columns([2, 2, 2, 2])
             col1.metric("Starting Required Life Cover", f"${starting_cover:,.0f}")
             col2.metric("Phase Out Length (Years)", f"{full_cover_t_total:.0f}")
+            col3.metric("Holding Amount", f"${holding_amount:,.0f}")
+            col4.metric("Funeral Cost", f"${funeral_cost:,.0f}")
             st.dataframe(
                 df_total.style.format({
                     "KiwiSaver Start Balance": "{:,.2f}",
                     "Total Assets Start": "{:,.2f}",
                     "Total Liabilities Start": "{:,.2f}",
                     "Responsibilities Start": "{:,.2f}",
-                    "Baseline Premium": "{:,.2f}",
                     "Required Cover": "{:,.2f}",
+                    "Baseline Premium": "{:,.2f}",
                     "Premium w/ Offset": "{:,.2f}",
                     "Premium Saving": "{:,.2f}",
                     "Voluntary Contribution": "{:,.2f}",
                     "Annual Salary Contribution": "{:,.2f}",
                     "Annual Investment Return": "{:,.2f}",
                     "KiwiSaver End Balance": "{:,.2f}",
-                    "Total Assets": "{:,.2f}",
-                    "Total Liabilities": "{:,.2f}",
-                    "Responsibilities": "{:,.2f}"
+                    "Total Assets End": "{:,.2f}",
+                    "Total Liabilities End": "{:,.2f}",
+                    "Responsibilities End": "{:,.2f}"
                 }),
                 hide_index=True
             )
