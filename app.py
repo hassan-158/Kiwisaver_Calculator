@@ -8,16 +8,24 @@ from calculator import *
 
 # Branding colours
 BRAND = {
-    "yellow": "#FFD200",
+    "blue": "#0EB8D1",
     "dark": "#222222",
 }
 
-col1, col2 = st.columns([0.2, 1])
+col1, col2 = st.columns([0.3, 1])
 with col1:
-    logo = Image.open("assets/logo.png")
+    logo = Image.open("assets/logo_cropped.png")
     st.image(logo, use_container_width=True)
+    st.markdown(
+        "<p style='font-size:12px; color:#0EB8D1; margin-top:-5px;'>Rethink today. Reinvest into tomorrow.</p>",
+        unsafe_allow_html=True
+    )
+st.markdown(
+    "<hr style='border:1px solid #0EB8D1; margin-top:5px; margin-bottom:25px;'>",
+    unsafe_allow_html=True
+)
 
-st.title("Wealthhq Life Cover Offset Calculator")
+st.title("NZSaver Life Cover Offset Calculator")
 
 st.set_page_config(page_title="KiwiSaver Offset Projection", layout="wide")
 st.write("Enter your details below to run the projection:")
@@ -192,7 +200,7 @@ if st.button("Run Projection"):
                 y=df_phase["KiwiSaver End Balance"],
                 mode="lines+markers",
                 name="KiwiSaver (Phase-Out)",
-                line=dict(color=BRAND["yellow"], width=3)
+                line=dict(color=BRAND["blue"], width=3)
             ))
             fig_ks.add_trace(go.Scatter(
                 x=df_no_offset["year"] + current_age,
@@ -211,7 +219,7 @@ if st.button("Run Projection"):
                 y=df_phase["Premium w/ Offset"],
                 mode="lines+markers",
                 name="Premium (Phase-Out)",
-                line=dict(color=BRAND["yellow"], width=3)
+                line=dict(color=BRAND["blue"], width=3)
             ))
             fig_prem.add_trace(go.Scatter(
                 x=df_no_offset["year"] + current_age,
@@ -232,7 +240,7 @@ if st.button("Run Projection"):
                 y=df_phase["Effective Cover"],
                 mode="lines+markers",
                 name="Required Cover (Phase-Out)",
-                line=dict(color=BRAND["yellow"], width=3)
+                line=dict(color=BRAND["blue"], width=3)
             ))
             fig_cover.add_trace(go.Scatter(
                 x=df_no_offset["year"] + current_age,
@@ -251,7 +259,7 @@ if st.button("Run Projection"):
                 y=df_phase["Annual Investment Return"],
                 mode="lines+markers",
                 name="Investment Return (Phase-Out)",
-                line=dict(color=BRAND["yellow"], width=3)
+                line=dict(color=BRAND["blue"], width=3)
             ))
             fig_return.add_trace(go.Scatter(
                 x=df_no_offset["year"] + current_age,
