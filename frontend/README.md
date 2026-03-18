@@ -44,3 +44,5 @@ run api.py from the root with the following:
 
 cd into frontend and run the following:
     npm run dev
+
+    

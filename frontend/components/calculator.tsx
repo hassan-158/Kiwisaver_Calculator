@@ -153,8 +153,8 @@ export default function Calculator() {
           </label>
 
           <label>
-            KiwiSaver Contribution
-            <div className="hint-circle" title="Your contribution rate to KiwiSaver">?</div>
+            Employee & Employer KiwiSaver
+            <div className="hint-circle" title="Combined employee and employer contribution rate to KiwiSaver">?</div>
             <div className="input-wrapper percent">
               <input
                 type="text"
