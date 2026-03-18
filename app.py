@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from PIL import Image
 
-from calculator import *
+from backend.calculator import *
 
 
 # Branding colours
