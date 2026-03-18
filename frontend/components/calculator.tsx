@@ -43,7 +43,7 @@ export default function Calculator() {
         kiwisaver_rate: kiwisaverRate,
       };
 
-      const res = await fetch("http://localhost:8000/calculate", {
+      const res = await fetch("https://kiwisaver-calculator.onrender.com/calculate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
