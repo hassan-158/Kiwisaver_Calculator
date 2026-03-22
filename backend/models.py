@@ -7,3 +7,4 @@ class ProjectionRequest(BaseModel):
     kiwisaver_balance: float = Field(ge=0)
     salary: float = Field(ge=0)
     kiwisaver_rate: float = Field(ge=0)
+    investment_type: str = "balanced"

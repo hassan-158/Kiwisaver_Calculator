@@ -11,7 +11,6 @@ const BRAND = {
 };
 
 export default function Calculator() {
-  // Inputs start blank
   const [currentAge, setCurrentAge] = useState<number | "">("");
   const [lifeCover, setLifeCover] = useState<number | "">("");
   const [premium, setPremium] = useState<number | "">("");
@@ -19,6 +18,9 @@ export default function Calculator() {
   const [salary, setSalary] = useState<number | "">("");
   const [kiwisaverRate, setKiwisaverRate] = useState(0);
   const [kiwisaverRateInput, setKiwisaverRateInput] = useState("");
+  const [investmentType, setInvestmentType] = useState<
+    "growth" | "balanced" | "conservative"
+  >("balanced");
 
   const [results, setResults] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -34,7 +36,6 @@ export default function Calculator() {
     setError("");
     setResults(null);
 
-    // Check for missing inputs
     if (
       currentAge === "" ||
       lifeCover === "" ||
@@ -56,16 +57,21 @@ export default function Calculator() {
         kiwisaver_balance: kiwisaverBalance,
         salary: salary,
         kiwisaver_rate: kiwisaverRate,
+        investment_type: investmentType,
       };
 
-      const res = await fetch(
-        "https://kiwisaver-calculator.onrender.com/calculate",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = await fetch("https://kiwisaver-calculator.onrender.com/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      // // DEV
+      // const res = await fetch("http://localhost:8000/calculate", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(payload),
+      // });
 
       if (!res.ok) throw new Error("API error");
 
@@ -98,15 +104,19 @@ export default function Calculator() {
       </header>
 
       <h1 className="main-heading">
-        NZSaver Life Cover <span style={{ color: BRAND.blue }}>Offset Calculator</span>
+        NZSaver Life Cover{" "}
+        <span style={{ color: BRAND.blue }}>Offset Calculator</span>
       </h1>
 
       <section className="form-card">
         <h2>Enter your details</h2>
+
         <div className="form-grid">
           <label>
             Current Age
-            <div className="hint-circle" title="Enter your current age in years">?</div>
+            <div className="hint-circle" title="Enter your current age in years">
+              ?
+            </div>
             <div className="input-wrapper">
               <input
                 type="text"
@@ -118,7 +128,9 @@ export default function Calculator() {
 
           <label>
             Life Cover
-            <div className="hint-circle" title="Total life cover required">?</div>
+            <div className="hint-circle" title="Total life cover required">
+              ?
+            </div>
             <div className="input-wrapper currency">
               <span className="prefix">$</span>
               <input
@@ -132,7 +144,9 @@ export default function Calculator() {
 
           <label>
             Annual Insurance Premium
-            <div className="hint-circle" title="Yearly cost of life cover">?</div>
+            <div className="hint-circle" title="Yearly cost of life cover">
+              ?
+            </div>
             <div className="input-wrapper currency">
               <span className="prefix">$</span>
               <input
@@ -146,7 +160,9 @@ export default function Calculator() {
 
           <label>
             Current KiwiSaver Balance
-            <div className="hint-circle" title="Current KiwiSaver account balance">?</div>
+            <div className="hint-circle" title="Current KiwiSaver account balance">
+              ?
+            </div>
             <div className="input-wrapper currency">
               <span className="prefix">$</span>
               <input
@@ -160,7 +176,9 @@ export default function Calculator() {
 
           <label>
             Pre-tax Annual Salary
-            <div className="hint-circle" title="Your annual salary before tax">?</div>
+            <div className="hint-circle" title="Your annual salary before tax">
+              ?
+            </div>
             <div className="input-wrapper currency">
               <span className="prefix">$</span>
               <input
@@ -174,7 +192,12 @@ export default function Calculator() {
 
           <label>
             Employee & Employer KiwiSaver
-            <div className="hint-circle" title="Combined contribution rate from employee and employer">?</div>
+            <div
+              className="hint-circle"
+              title="Combined contribution rate from employee and employer"
+            >
+              ?
+            </div>
             <div className="input-wrapper percent">
               <input
                 type="text"
@@ -193,6 +216,20 @@ export default function Calculator() {
           </label>
         </div>
 
+        {/* --- Investment buttons row under inputs --- */}
+        <div className="investment-row">
+          {["growth", "balanced", "conservative"].map((type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setInvestmentType(type as any)}
+              className={investmentType === type ? "active" : ""}
+            >
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </button>
+          ))}
+        </div>
+
         <button className="submit-btn" onClick={runProjection} disabled={loading}>
           {loading ? "Running..." : "Run Projection"}
         </button>
@@ -201,17 +238,20 @@ export default function Calculator() {
 
       {results && (
         <section className="results-card">
-          <div className="results-header">
-            <h2>Results</h2>
-            <div className="age-notice">
-              <span className="icon">⏱</span>
-              Calculated at age 65
-            </div>
+        <div className="results-header">
+          <h2>Projected Results</h2>
+          <h2 className="results-note">
+            Using NZSaver Phaseout Process
+          </h2>
+          <div className="age-notice">
+            <span className="icon">⏱</span>
+            Calculated at age 65
           </div>
+        </div>
 
           <div className="metrics-grid">
             <div className="metric" style={{ borderTop: `4px solid ${BRAND.blue}` }}>
-              <p>Projected Savings of Insurance Premiums by Age 65</p>
+              <p>Savings of Insurance Premiums by Age 65</p>
               <strong>${results?.total_savings?.toLocaleString() ?? "0"}</strong>
             </div>
             <div
@@ -221,7 +261,7 @@ export default function Calculator() {
                 background: BRAND.lightBlueBg,
               }}
             >
-              <p>Projected Increase in KiwiSaver Balance by Age 65</p>
+              <p>Increase in KiwiSaver Balance by Age 65</p>
               <strong>${results?.kiwisaver_increase?.toLocaleString() ?? "0"}</strong>
               <div
                 style={{
@@ -235,7 +275,7 @@ export default function Calculator() {
               </div>
             </div>
             <div className="metric" style={{ borderTop: `4px solid ${BRAND.blue}` }}>
-              <p>Projected Average Uplift Per Year to Age 65</p>
+              <p>Average Uplift Per Year to Age 65</p>
               <strong>${results?.true_cost_per_year?.toLocaleString() ?? "0"}</strong>
             </div>
           </div>
@@ -301,39 +341,12 @@ export default function Calculator() {
           border: 1px solid #eef2f6;
         }
 
-        .results-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 20px;
-        }
-
-        .age-notice {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: #f1f5f9;
-          padding: 6px 12px;
-          border-radius: 20px;
-          font-size: 12px;
-          font-weight: 600;
-          color: #475569;
-          border: 1px solid #e2e8f0;
-        }
-
-        h2 {
-          margin: 0;
-          color: ${BRAND.dark};
-          font-size: 20px;
-          font-weight: 700;
-        }
-
         .form-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
           gap: 20px;
           margin-top: 20px;
-          margin-bottom: 25px;
+          margin-bottom: 20px;
         }
 
         label {
@@ -401,6 +414,36 @@ export default function Calculator() {
           box-shadow: 0 0 0 3px rgba(14, 184, 209, 0.1);
         }
 
+        /* --- Investment buttons row --- */
+        .investment-row {
+          display: flex;
+          gap: 20px;
+          margin-bottom: 20px;
+        }
+
+        .investment-row button {
+          flex: 1;
+          height: 42px;
+          padding: 0 12px;
+          border-radius: 6px;
+          border: 1px solid ${BRAND.blue};
+          background: #fff;
+          font-weight: 600;
+          font-size: 15px;
+          line-height: 1;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .investment-row button.active {
+          background: ${BRAND.blue};
+          color: #fff;
+        }
+
+        .investment-row button:hover:not(.active) {
+          background: rgba(14, 184, 209, 0.1);
+        }
+
         .submit-btn {
           padding: 14px 24px;
           background: ${BRAND.blue};
@@ -419,6 +462,32 @@ export default function Calculator() {
           background: #0aaec2;
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(14, 184, 209, 0.25);
+        }
+
+        .results-header {
+          position: relative;
+          margin-bottom: 20px;
+        }
+
+        .note-under-header {
+          margin-top: 4px;
+        }
+
+        .age-notice {
+          position: absolute;
+          top: 5px;
+          right: 5px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: #f1f5f9;
+          padding: 4px 10px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 600;
+          color: #475569;
+          border: 1px solid #e2e8f0;
+          white-space: nowrap;
         }
 
         .metrics-grid {
