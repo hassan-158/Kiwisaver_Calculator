@@ -18,17 +18,13 @@ export default function Calculator() {
   const [salary, setSalary] = useState<number | "">("");
   const [kiwisaverRate, setKiwisaverRate] = useState(0);
   const [kiwisaverRateInput, setKiwisaverRateInput] = useState("");
-  const [investmentType, setInvestmentType] = useState<
-    "growth" | "balanced" | "conservative"
-  >("balanced");
+  const [investmentType, setInvestmentType] = useState<"growth" | "balanced" | "conservative">("balanced");
 
   const [results, setResults] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const formatCurrency = (val: number) =>
-    new Intl.NumberFormat("en-NZ").format(val);
-
+  const formatCurrency = (val: number) => new Intl.NumberFormat("en-NZ").format(val);
   const parseNumber = (val: string) => Number(val.replace(/[^0-9.]/g, ""));
 
   async function runProjection() {
@@ -66,13 +62,6 @@ export default function Calculator() {
         body: JSON.stringify(payload),
       });
 
-      // // DEV
-      // const res = await fetch("http://localhost:8000/calculate", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(payload),
-      // });
-
       if (!res.ok) throw new Error("API error");
 
       const data = await res.json();
@@ -104,19 +93,17 @@ export default function Calculator() {
       </header>
 
       <h1 className="main-heading">
-        NZSaver Life Cover{" "}
-        <span style={{ color: BRAND.blue }}>Offset Calculator</span>
+        NZSaver Life Cover <span style={{ color: BRAND.blue }}>Offset Calculator</span>
       </h1>
 
       <section className="form-card">
         <h2>Enter your details</h2>
 
         <div className="form-grid">
+          {/* Inputs */}
           <label>
             Current Age
-            <div className="hint-circle" title="Enter your current age in years">
-              ?
-            </div>
+            <div className="hint-circle" title="Enter your current age in years">?</div>
             <div className="input-wrapper">
               <input
                 type="text"
@@ -128,9 +115,7 @@ export default function Calculator() {
 
           <label>
             Life Cover
-            <div className="hint-circle" title="Total life cover required">
-              ?
-            </div>
+            <div className="hint-circle" title="Total life cover required">?</div>
             <div className="input-wrapper currency">
               <span className="prefix">$</span>
               <input
@@ -144,9 +129,7 @@ export default function Calculator() {
 
           <label>
             Annual Insurance Premium
-            <div className="hint-circle" title="Yearly cost of life cover">
-              ?
-            </div>
+            <div className="hint-circle" title="Yearly cost of life cover">?</div>
             <div className="input-wrapper currency">
               <span className="prefix">$</span>
               <input
@@ -160,9 +143,7 @@ export default function Calculator() {
 
           <label>
             Current KiwiSaver Balance
-            <div className="hint-circle" title="Current KiwiSaver account balance">
-              ?
-            </div>
+            <div className="hint-circle" title="Current KiwiSaver account balance">?</div>
             <div className="input-wrapper currency">
               <span className="prefix">$</span>
               <input
@@ -176,9 +157,7 @@ export default function Calculator() {
 
           <label>
             Pre-tax Annual Salary
-            <div className="hint-circle" title="Your annual salary before tax">
-              ?
-            </div>
+            <div className="hint-circle" title="Your annual salary before tax">?</div>
             <div className="input-wrapper currency">
               <span className="prefix">$</span>
               <input
@@ -192,12 +171,7 @@ export default function Calculator() {
 
           <label>
             Employee & Employer KiwiSaver
-            <div
-              className="hint-circle"
-              title="Combined contribution rate from employee and employer"
-            >
-              ?
-            </div>
+            <div className="hint-circle" title="Combined contribution rate from employee and employer">?</div>
             <div className="input-wrapper percent">
               <input
                 type="text"
@@ -214,10 +188,8 @@ export default function Calculator() {
               <span className="suffix">%</span>
             </div>
           </label>
-        </div>
 
-        {/* --- Investment buttons row under inputs --- */}
-        <div className="investment-row">
+          {/* Investment Buttons as separate grid items */}
           {["growth", "balanced", "conservative"].map((type) => (
             <button
               key={type}
@@ -236,18 +208,17 @@ export default function Calculator() {
         {error && <p className="error">{error}</p>}
       </section>
 
+      {/* Results Section */}
       {results && (
         <section className="results-card">
-        <div className="results-header">
-          <h2>Projected Results</h2>
-          <h2 className="results-note">
-            Using NZSaver Phaseout Process
-          </h2>
-          <div className="age-notice">
-            <span className="icon">⏱</span>
-            Calculated at age 65
+          <div className="results-header">
+            <h2>Projected Results</h2>
+            <h2 className="results-note">Using NZSaver Phaseout Process</h2>
+            <div className="age-notice">
+              <span className="icon">⏱</span>
+              Calculated at age 65
+            </div>
           </div>
-        </div>
 
           <div className="metrics-grid">
             <div className="metric" style={{ borderTop: `4px solid ${BRAND.blue}` }}>
@@ -414,33 +385,24 @@ export default function Calculator() {
           box-shadow: 0 0 0 3px rgba(14, 184, 209, 0.1);
         }
 
-        /* --- Investment buttons row --- */
-        .investment-row {
-          display: flex;
-          gap: 20px;
-          margin-bottom: 20px;
-        }
-
-        .investment-row button {
-          flex: 1;
+        .form-grid > button {
           height: 42px;
-          padding: 0 12px;
           border-radius: 6px;
           border: 1px solid ${BRAND.blue};
           background: #fff;
           font-weight: 600;
           font-size: 15px;
-          line-height: 1;
           cursor: pointer;
           transition: all 0.2s ease;
+          width: 100%;
         }
 
-        .investment-row button.active {
+        .form-grid > button.active {
           background: ${BRAND.blue};
           color: #fff;
         }
 
-        .investment-row button:hover:not(.active) {
+        .form-grid > button:hover:not(.active) {
           background: rgba(14, 184, 209, 0.1);
         }
 
@@ -467,10 +429,6 @@ export default function Calculator() {
         .results-header {
           position: relative;
           margin-bottom: 20px;
-        }
-
-        .note-under-header {
-          margin-top: 4px;
         }
 
         .age-notice {
@@ -510,6 +468,7 @@ export default function Calculator() {
           color: #64748b;
           font-weight: 500;
         }
+
         .metric strong {
           font-size: 22px;
           color: ${BRAND.dark};
