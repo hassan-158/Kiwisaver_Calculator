@@ -70,6 +70,11 @@ def calculate_projection(req: ProjectionRequest):
         ks_end_without_offset
     )
 
+    ks_increase_pct = (
+        ((ks_end_with_offset - ks_end_without_offset) / ks_end_without_offset) * 100
+        if ks_end_without_offset > 0 else 0
+    )
+
     per_year_true_cost = (
         total_ks_increase /
         max(1, STOP_AGE - req.current_age)
@@ -82,5 +87,6 @@ def calculate_projection(req: ProjectionRequest):
     return {
         "total_savings": max(0, round(total_savings, 2)),
         "kiwisaver_increase": max(0, round(total_ks_increase, 2)),
+        "kiwisaver_increase_pct": round(ks_increase_pct, 2), 
         "true_cost_per_year": max(0, round(per_year_true_cost, 2)),
     }
