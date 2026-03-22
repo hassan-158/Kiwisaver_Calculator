@@ -16,6 +16,9 @@ export default function Calculator() {
   const [salary, setSalary] = useState(80000);
   const [kiwisaverRate, setKiwisaverRate] = useState(0.03);
 
+  // ✅ ADDED (for decimal input)
+  const [kiwisaverRateInput, setKiwisaverRateInput] = useState("3");
+
   const [results, setResults] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -158,8 +161,16 @@ export default function Calculator() {
             <div className="input-wrapper percent">
               <input
                 type="text"
-                value={kiwisaverRate * 100}
-                onChange={(e) => setKiwisaverRate(parseNumber(e.target.value) / 100)}
+                value={kiwisaverRateInput}
+                onChange={(e) => {
+                  const val = e.target.value;
+
+                  if (/^\d*\.?\d*$/.test(val)) {
+                    setKiwisaverRateInput(val);
+                    const parsed = parseFloat(val);
+                    setKiwisaverRate(isNaN(parsed) ? 0 : parsed / 100);
+                  }
+                }}
               />
               <span className="suffix">%</span>
             </div>
