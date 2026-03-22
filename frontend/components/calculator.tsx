@@ -131,7 +131,7 @@ export default function Calculator() {
           </label>
 
           <label>
-            Annual Premium
+            Annual Insurance Premium
             <div className="hint-circle" title="Yearly cost of life cover">?</div>
             <div className="input-wrapper currency">
               <span className="prefix">$</span>
